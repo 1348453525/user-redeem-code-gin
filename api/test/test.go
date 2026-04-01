@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/1348453525/user-redeem-code-gin/pkg/result"
 	"github.com/gin-gonic/gin"
@@ -38,6 +39,11 @@ func TestErrorData(c *gin.Context) {
 			"error": "test/test",
 		},
 	)
+}
+
+func Shutdown(c *gin.Context) {
+	time.Sleep(10 * time.Second)
+	result.Success(c, gin.H{}, 200, "ok")
 }
 
 func Db(c *gin.Context) {

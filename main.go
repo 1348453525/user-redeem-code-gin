@@ -1,7 +1,14 @@
 package main
 
 import (
+	"context"
+	"errors"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/1348453525/user-redeem-code-gin/initialize"
 )
@@ -12,13 +19,30 @@ func main() {
 	// r.Run(":8080")
 
 	// 配置 HTTP 服务
-	src := &http.Server{
+	srv := &http.Server{
 		Addr:    ":8080",
 		Handler: r,
 	}
 
 	// 启动服务
-	if err := src.ListenAndServe(); err != nil {
-		panic(err)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	// 监听系统信号
+	quit := make(chan os.Signal, 1)
+	// 监听 SIGINT（Ctrl+C）、SIGTERM（kill 命令）
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit // 阻塞等待信号
+	log.Println("shutdown server ...")
+
+	// 优雅关闭：设置 5 秒超时，处理完现有请求后退出
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("server shutdown:", err)
 	}
+	log.Println("server exited")
 }

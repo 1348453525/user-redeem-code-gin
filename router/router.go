@@ -15,6 +15,7 @@ func RouterGroup(r *gin.RouterGroup) {
 		testGroup.GET("/TestErrorData", test.TestErrorData)
 		testGroup.GET("/Db", test.Db)
 		testGroup.GET("/Redis", test.Redis)
+		testGroup.GET("/Shutdown", test.Shutdown)
 	}
 
 	// 用户
