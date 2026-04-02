@@ -48,8 +48,9 @@ func main() {
 }
 
 func init() {
+	cfgFile := "./config.yaml"
 	// 初始化配置
-	initialize.InitConfig()
+	initialize.InitConfig(cfgFile)
 	// 初始化日志
 	initialize.InitLogger()
 	// 初始化数据库

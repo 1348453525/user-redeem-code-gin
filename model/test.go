@@ -4,15 +4,18 @@ import (
 	"github.com/1348453525/user-redeem-code-gin/global"
 )
 
-// Test 模型
+const TableNameTest = "test"
+
+// Test mapped from table <test>
 type Test struct {
-	ID    uint64 `json:"id" gorm:"column:id"`
-	Key   string `json:"key" gorm:"column:key"`
-	Value string `json:"value" gorm:"column:value"`
+	ID    uint64 `json:"id"`
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
-func (t *Test) TableName() string {
-	return "test"
+// TableName Test's table name
+func (*Test) TableName() string {
+	return TableNameTest
 }
 
 // GetByID 根据ID获取Test信息
