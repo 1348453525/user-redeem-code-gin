@@ -1,0 +1,24 @@
+# 项目启动端口
+app:
+  name: user-redeem-code-gin
+  version: v0.0.1
+  addr: :8080
+  mode: dev # release, dev
+
+# 数据库配置
+db:
+  driver: mysql
+  # dsn: root:root@tcp(127.0.0.1:3306)/test?charset=utf8&parseTime=True&loc=Local
+  host: 127.0.0.1
+  port: 3306
+  user: root
+  password: root
+  db: user_redeem_code
+  charset: utf8mb4
+  max_idle_conns: 10 # 最大空闲连接数
+  max_open_conns: 100 # 最大连接数
+
+# redis 配置
+redis:
+  addr: 127.0.0.1:6379
+  password:

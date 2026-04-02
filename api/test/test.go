@@ -1,11 +1,14 @@
 package test
 
 import (
-	"fmt"
+	"errors"
+	"strconv"
 	"time"
 
+	"github.com/1348453525/user-redeem-code-gin/logic"
 	"github.com/1348453525/user-redeem-code-gin/pkg/result"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func Test(c *gin.Context) {
@@ -47,9 +50,27 @@ func Shutdown(c *gin.Context) {
 }
 
 func Db(c *gin.Context) {
-	fmt.Println("test")
+	id, _ := strconv.Atoi(c.Query("id"))
+	if id <= 0 {
+		result.Error(c, 400, "参数错误")
+		return
+	}
+
+	res, err := logic.Test.Db(uint64(id))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			result.Success(c)
+		} else {
+			result.Error(c, 500, "查询失败："+err.Error())
+		}
+		return
+	}
+	result.Success(c, res)
 }
 
 func Redis(c *gin.Context) {
-	fmt.Println("test")
+	value := logic.Test.Redis()
+	result.Success(c, gin.H{
+		"value": value,
+	})
 }

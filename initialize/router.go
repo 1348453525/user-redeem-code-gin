@@ -3,11 +3,18 @@ package initialize
 import (
 	"net/http"
 
+	"github.com/1348453525/user-redeem-code-gin/global"
 	"github.com/1348453525/user-redeem-code-gin/router"
 	"github.com/gin-gonic/gin"
 )
 
 func InitRouter() *gin.Engine {
+	if global.Config.Server.Mode == "dev" {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	// 初始化 Gin 引擎
 	r := gin.Default()
 
