@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/1348453525/user-redeem-code-gin/api/test"
 	"github.com/1348453525/user-redeem-code-gin/api/user"
+	"github.com/1348453525/user-redeem-code-gin/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,16 +20,19 @@ func RouterGroup(r *gin.RouterGroup) {
 		testGroup.GET("/Shutdown", test.Shutdown)
 	}
 
+	r.POST("/Register", user.Register)                            // 注册
+	r.POST("/Login", user.Login)                                  // 登录
+	r.GET("/Logout", middleware.JWTAuthMiddleware(), user.Logout) // 退出
+
 	// 用户
 	userGroup := r.Group("/User")
+	userGroup.Use(middleware.JWTAuthMiddleware())
 	{
-		userGroup.POST("/Register", user.Register) // 注册
-		userGroup.POST("/Login", user.Login)       // 登录
-		userGroup.GET("/Logout", user.Logout)      // 退出
-		userGroup.GET("/Info", user.Info)          // 获取用户信息
-		userGroup.GET("/GetList", user.GetList)    // 获取用户列表
-		userGroup.PUT("/Update", user.Update)      // 更新用户信息
-		userGroup.DELETE("/Delete", user.Delete)   // 删除用户
+		userGroup.GET("/Logout", user.Logout)    // 退出
+		userGroup.GET("/Info", user.Info)        // 获取用户信息
+		userGroup.GET("/GetList", user.GetList)  // 获取用户列表
+		userGroup.PUT("/Update", user.Update)    // 更新用户信息
+		userGroup.DELETE("/Delete", user.Delete) // 删除用户
 	}
 
 	// 兑换码
