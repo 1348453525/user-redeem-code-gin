@@ -10,6 +10,7 @@ import (
 	"github.com/1348453525/user-redeem-code-gin/entity"
 	"github.com/1348453525/user-redeem-code-gin/global"
 	"github.com/1348453525/user-redeem-code-gin/model"
+	"github.com/1348453525/user-redeem-code-gin/pkg/helper"
 	"github.com/1348453525/user-redeem-code-gin/pkg/jwt"
 	"github.com/anaskhan96/go-password-encoder"
 	"github.com/gin-gonic/gin"
@@ -17,8 +18,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type user struct {
-}
+type user struct{}
 
 var User = &user{}
 
@@ -80,9 +80,7 @@ func (u *user) Register(c *gin.Context, r *entity.RegisterDto) (*entity.Register
 		Gender:   user.Gender,
 		Birthday: "",
 	}
-	if user.Birthday != nil {
-		resp.Birthday = user.Birthday.Format("2006-01-02")
-	}
+	resp.Birthday = helper.FormatBirthday(user.Birthday)
 	return resp, nil
 }
 
@@ -122,10 +120,7 @@ func (u *user) Login(c *gin.Context, r *entity.LoginDto) (*entity.LoginDvo, erro
 	}
 
 	// 返回数据
-	var birthday string
-	if user.Birthday != nil {
-		birthday = user.Birthday.Format("2006-01-02")
-	}
+	birthday := helper.FormatBirthday(user.Birthday)
 	resp := &entity.LoginDvo{
 		Info: entity.UserInfoDvo{
 			ID:       user.ID,
@@ -154,9 +149,7 @@ func (u *user) Info(c *gin.Context, id int64) (*entity.UserInfoDvo, error) {
 		Gender:   user.Gender,
 		Birthday: "",
 	}
-	if user.Birthday != nil {
-		resp.Birthday = user.Birthday.Format("2006-01-02")
-	}
+	resp.Birthday = helper.FormatBirthday(user.Birthday)
 	return resp, nil
 }
 
@@ -177,9 +170,7 @@ func (u *user) GetList(c *gin.Context, r *entity.GetUserListDto) (*entity.GetUse
 			Gender:   v.Gender,
 			Birthday: "",
 		}
-		if v.Birthday != nil {
-			userInfoDvo.Birthday = v.Birthday.Format("2006-01-02")
-		}
+		userInfoDvo.Birthday = helper.FormatBirthday(v.Birthday)
 		resp.Data = append(resp.Data, userInfoDvo)
 	}
 	return resp, nil

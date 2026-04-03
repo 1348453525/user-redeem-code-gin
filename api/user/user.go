@@ -2,10 +2,10 @@ package user
 
 import (
 	"errors"
-	"strconv"
 
 	"github.com/1348453525/user-redeem-code-gin/entity"
 	"github.com/1348453525/user-redeem-code-gin/logic"
+	"github.com/1348453525/user-redeem-code-gin/pkg/helper"
 	"github.com/1348453525/user-redeem-code-gin/pkg/result"
 	"github.com/1348453525/user-redeem-code-gin/pkg/util"
 	"github.com/gin-gonic/gin"
@@ -56,14 +56,19 @@ func Logout(c *gin.Context) {
 
 func Info(c *gin.Context) {
 	// 接收参数
-	id, _ := strconv.Atoi(c.Query("id"))
-	if id <= 0 {
+	// id, _ := strconv.Atoi(c.Query("id"))
+	// if id <= 0 {
+	// 	result.Error(c, 400, entity.ErrParam.Error())
+	// 	return
+	// }
+	id, err := helper.GetUserID(c)
+	if err != nil {
 		result.Error(c, 400, entity.ErrParam.Error())
 		return
 	}
 
 	// 处理逻辑
-	resp, err := logic.User.Info(c, int64(id))
+	resp, err := logic.User.Info(c, id)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			result.Error(c, 500, entity.ErrInternal.Error())
@@ -94,6 +99,12 @@ func GetList(c *gin.Context) {
 }
 
 func Update(c *gin.Context) {
+	id, err := helper.GetUserID(c)
+	if err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
+
 	// 接收参数
 	var dto entity.UpdateUserDto
 	_ = c.ShouldBindJSON(&dto)
@@ -102,9 +113,13 @@ func Update(c *gin.Context) {
 	if ok := util.Validate(c, dto); !ok {
 		return
 	}
+	if id != dto.ID {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
 
 	// 处理逻辑
-	err := logic.User.Update(c, &dto)
+	err = logic.User.Update(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -114,14 +129,19 @@ func Update(c *gin.Context) {
 
 func Delete(c *gin.Context) {
 	// 接收参数
-	id, _ := strconv.Atoi(c.Query("id"))
-	if id <= 0 {
+	// id, _ := strconv.Atoi(c.Query("id"))
+	// if id <= 0 {
+	// 	result.Error(c, 400, entity.ErrParam.Error())
+	// 	return
+	// }
+	id, err := helper.GetUserID(c)
+	if err != nil {
 		result.Error(c, 400, entity.ErrParam.Error())
 		return
 	}
 
 	// 处理逻辑
-	err := logic.User.Delete(c, int64(id))
+	err = logic.User.Delete(c, id)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return

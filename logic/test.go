@@ -10,8 +10,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type test struct {
-}
+type test struct{}
 
 var Test = &test{}
 
