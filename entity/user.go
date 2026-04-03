@@ -7,6 +7,8 @@ import (
 var (
 	ErrPasswordNotMatch = errors.New("密码不匹配")
 	ErrUserExisted      = errors.New("用户已存在")
+	ErrUserDisabled     = errors.New("账户已停用")
+	ErrPasswordError    = errors.New("密码错误")
 )
 
 type RegisterDto struct {
@@ -56,4 +58,14 @@ type UpdateUserDto struct {
 	Mobile   string `json:"mobile" validate:"required"`
 	Gender   int32  `json:"gender" validate:"required"`
 	Birthday string `json:"birthday" validate:"required"`
+}
+
+type LoginDto struct {
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type LoginDvo struct {
+	Info  UserInfoDvo `json:"info"`
+	Token string      `json:"token"`
 }

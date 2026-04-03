@@ -32,7 +32,22 @@ func Register(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
-	result.Success(c)
+	// 接收参数
+	var dto entity.LoginDto
+	_ = c.ShouldBindJSON(&dto)
+
+	// 验证参数
+	if ok := util.Validate(c, dto); !ok {
+		return
+	}
+
+	// 处理逻辑
+	resp, err := logic.User.Login(c, &dto)
+	if err != nil {
+		result.Error(c, 500, err.Error())
+		return
+	}
+	result.Success(c, resp)
 }
 
 func Logout(c *gin.Context) {

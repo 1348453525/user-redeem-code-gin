@@ -4,11 +4,13 @@ import (
 	"crypto/sha512"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/1348453525/user-redeem-code-gin/entity"
 	"github.com/1348453525/user-redeem-code-gin/global"
 	"github.com/1348453525/user-redeem-code-gin/model"
+	"github.com/1348453525/user-redeem-code-gin/pkg/jwt"
 	"github.com/anaskhan96/go-password-encoder"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -80,6 +82,60 @@ func (u *user) Register(c *gin.Context, r *entity.RegisterDto) (*entity.Register
 	}
 	if user.Birthday != nil {
 		resp.Birthday = user.Birthday.Format("2006-01-02")
+	}
+	return resp, nil
+}
+
+func (u *user) Login(c *gin.Context, r *entity.LoginDto) (*entity.LoginDvo, error) {
+	// 查询用户
+	var user model.User
+	result := global.DB.Where("username = ?", r.Username).First(&user)
+	if result.RowsAffected == 0 {
+		return nil, entity.ErrParam
+	}
+	if result.Error != nil {
+		zap.L().Error("查询用户失败：", zap.Error(result.Error))
+	}
+
+	// 检验状态
+	if user.IsDel == 1 {
+		return nil, entity.ErrUserDisabled
+	}
+
+	// 校验密码
+	options := &password.Options{
+		SaltLen:      16,
+		Iterations:   100,
+		KeyLen:       32,
+		HashFunction: sha512.New,
+	}
+	encrypted := strings.Split(user.Password, "$")
+	if !password.Verify(r.Password, encrypted[1], encrypted[2], options) {
+		return nil, entity.ErrPasswordError
+	}
+
+	// 生成 token
+	token, err := jwt.GenerateToken(user.ID)
+	if err != nil {
+		zap.L().Error("生成token失败：", zap.Error(err))
+		return nil, entity.ErrInternal
+	}
+
+	// 返回数据
+	var birthday string
+	if user.Birthday != nil {
+		birthday = user.Birthday.Format("2006-01-02")
+	}
+	resp := &entity.LoginDvo{
+		Info: entity.UserInfoDvo{
+			ID:       user.ID,
+			Username: user.Username,
+			Nickname: user.Nickname,
+			Mobile:   user.Mobile,
+			Gender:   user.Gender,
+			Birthday: birthday,
+		},
+		Token: token,
 	}
 	return resp, nil
 }
