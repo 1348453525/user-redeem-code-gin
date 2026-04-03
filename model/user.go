@@ -28,15 +28,15 @@ func (*User) TableName() string {
 	return TableNameUser
 }
 
-func (u *User) GetByID(id int64) error {
-	result := global.DB.Where("id = ?", id).First(u)
+func (m *User) GetByID(id int64) error {
+	result := global.DB.Where("id = ?", id).First(m)
 	if result.Error != nil {
 		return result.Error
 	}
 	return nil
 }
 
-func (u *User) GetList(page int32, pageSize int32) (list []*User, count int64) {
+func (m *User) GetList(page int32, pageSize int32) (list []*User, count int64) {
 	global.DB.Model(&User{}).Count(&count).Limit(int(pageSize)).Offset(int(pageSize * (page - 1))).Order("id desc").Find(&list)
 	return
 }

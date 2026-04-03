@@ -37,7 +37,7 @@ CREATE TABLE `redeem_code` (
     `value` varchar(255) NOT NULL DEFAULT '' COMMENT '兑换码',
     `usage_limit` int unsigned NOT NULL DEFAULT '1' COMMENT '可使用次数',
     `used_count` int unsigned NOT NULL DEFAULT '0' COMMENT '已使用数量',
-    `expiration_at` datetime DEFAULT NULL COMMENT '过期时间',
+    `expiration_at` datetime NOT NULL COMMENT '过期时间',
     `is_del` tinyint unsigned NOT NULL DEFAULT '2' COMMENT '是否删除：0，默认；1，已删除；2，未删除；',
     `deleted_at` datetime DEFAULT NULL,
     `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -2,6 +2,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/1348453525/user-redeem-code-gin/global"
 )
 
 const TableNameRedeemCodeBatch = "redeem_code_batch"
@@ -26,4 +28,17 @@ type RedeemCodeBatch struct {
 // TableName RedeemCodeBatch's table name
 func (*RedeemCodeBatch) TableName() string {
 	return TableNameRedeemCodeBatch
+}
+
+func (m *RedeemCodeBatch) GetByID(id int64) error {
+	result := global.DB.Where("id = ?", id).First(m)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (m *RedeemCodeBatch) GetList(page int32, pageSize int32) (list []*RedeemCodeBatch, count int64) {
+	global.DB.Model(&RedeemCodeBatch{}).Count(&count).Limit(int(pageSize)).Offset(int(pageSize * (page - 1))).Order("id desc").Find(&list)
+	return
 }

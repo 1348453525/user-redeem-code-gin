@@ -37,8 +37,30 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		// 校验用户状态
+		// var user model.User
+		// if err = user.GetByID(claims.ID); err != nil {
+		// 	result.Error(
+		// 		c,
+		// 		http.StatusUnauthorized,
+		// 		"用户不存在",
+		// 	)
+		// 	c.Abort()
+		// 	return
+		// }
+		// if user.IsDel == 1 {
+		// 	result.Error(
+		// 		c,
+		// 		http.StatusUnauthorized,
+		// 		entity.ErrUserDisabled.Error(),
+		// 	)
+		// 	c.Abort()
+		// 	return
+		// }
+
 		// 将用户信息存入上下文
 		c.Set("userID", claims.ID)
+		// c.Set("user", &user)
 		c.Next()
 	}
 }

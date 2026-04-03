@@ -1,4 +1,4 @@
-package redeem_code
+package redeem_code_batch
 
 import (
 	"errors"
@@ -6,11 +6,38 @@ import (
 
 	"github.com/1348453525/user-redeem-code-gin/entity"
 	"github.com/1348453525/user-redeem-code-gin/logic"
+	"github.com/1348453525/user-redeem-code-gin/pkg/helper"
 	"github.com/1348453525/user-redeem-code-gin/pkg/result"
 	"github.com/1348453525/user-redeem-code-gin/pkg/util"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
+
+func Create(c *gin.Context) {
+	// 获取用户 id
+	id, err := helper.GetUserID(c)
+	if err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
+
+	// 接收参数
+	var dto entity.CreateRedeemCodeBatchDto
+	_ = c.ShouldBindJSON(&dto)
+
+	// 验证参数
+	if ok := util.Validate(c, dto); !ok {
+		return
+	}
+
+	// 处理逻辑
+	resp, err := logic.RedeemCodeBatch.Create(c, id, &dto)
+	if err != nil {
+		result.Error(c, 500, err.Error())
+		return
+	}
+	result.Success(c, resp)
+}
 
 func Detail(c *gin.Context) {
 	// 接收参数
@@ -21,7 +48,7 @@ func Detail(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.RedeemCode.Detail(c, int64(id))
+	resp, err := logic.RedeemCodeBatch.Detail(c, int64(id))
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			result.Error(c, 500, entity.ErrInternal.Error())
@@ -34,7 +61,7 @@ func Detail(c *gin.Context) {
 
 func GetList(c *gin.Context) {
 	// 接收参数
-	var dto entity.GetRedeemCodeListDto
+	var dto entity.GetRedeemCodeBatchListDto
 	_ = c.ShouldBindQuery(&dto)
 
 	// 验证参数
@@ -43,7 +70,7 @@ func GetList(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.RedeemCode.GetList(c, &dto)
+	resp, err := logic.RedeemCodeBatch.GetList(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -53,7 +80,7 @@ func GetList(c *gin.Context) {
 
 func Update(c *gin.Context) {
 	// 接收参数
-	var dto entity.UpdateRedeemCodeDto
+	var dto entity.UpdateRedeemCodeBatchDto
 	_ = c.ShouldBindJSON(&dto)
 
 	// 验证参数
@@ -62,7 +89,7 @@ func Update(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	err := logic.RedeemCode.Update(c, &dto)
+	err := logic.RedeemCodeBatch.Update(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -79,26 +106,7 @@ func Delete(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	err := logic.RedeemCode.Delete(c, int64(id))
-	if err != nil {
-		result.Error(c, 500, err.Error())
-		return
-	}
-	result.Success(c)
-}
-
-func Use(c *gin.Context) {
-	// 接收参数
-	var dto entity.UseRedeemCodeDto
-	_ = c.ShouldBindJSON(&dto)
-
-	// 验证参数
-	if ok := util.Validate(c, dto); !ok {
-		return
-	}
-
-	// 处理逻辑
-	err := logic.RedeemCode.Use(c, &dto)
+	err := logic.RedeemCodeBatch.Delete(c, int64(id))
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return

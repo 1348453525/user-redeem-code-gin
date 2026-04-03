@@ -10,3 +10,7 @@ var (
 
 	ErrUserNotLogin = errors.New("用户未登录")
 )
+
+type ID64 struct {
+	ID int64 `json:"id" validate:"required,gte=1"`
+}

@@ -80,7 +80,7 @@ func (u *user) Register(c *gin.Context, r *entity.RegisterDto) (*entity.Register
 		Gender:   user.Gender,
 		Birthday: "",
 	}
-	resp.Birthday = helper.FormatBirthday(user.Birthday)
+	resp.Birthday = helper.FormatDate(user.Birthday)
 	return resp, nil
 }
 
@@ -120,7 +120,7 @@ func (u *user) Login(c *gin.Context, r *entity.LoginDto) (*entity.LoginDvo, erro
 	}
 
 	// 返回数据
-	birthday := helper.FormatBirthday(user.Birthday)
+	birthday := helper.FormatDate(user.Birthday)
 	resp := &entity.LoginDvo{
 		Info: entity.UserInfoDvo{
 			ID:       user.ID,
@@ -149,7 +149,7 @@ func (u *user) Info(c *gin.Context, id int64) (*entity.UserInfoDvo, error) {
 		Gender:   user.Gender,
 		Birthday: "",
 	}
-	resp.Birthday = helper.FormatBirthday(user.Birthday)
+	resp.Birthday = helper.FormatDate(user.Birthday)
 	return resp, nil
 }
 
@@ -170,7 +170,7 @@ func (u *user) GetList(c *gin.Context, r *entity.GetUserListDto) (*entity.GetUse
 			Gender:   v.Gender,
 			Birthday: "",
 		}
-		userInfoDvo.Birthday = helper.FormatBirthday(v.Birthday)
+		userInfoDvo.Birthday = helper.FormatDate(v.Birthday)
 		resp.Data = append(resp.Data, userInfoDvo)
 	}
 	return resp, nil
