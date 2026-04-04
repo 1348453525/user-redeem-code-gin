@@ -21,14 +21,7 @@ type RegisterDto struct {
 	Birthday        string `json:"birthday" validate:"required"`
 }
 
-type RegisterDvo struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Nickname string `json:"nickname"`
-	Mobile   string `json:"mobile"`
-	Gender   int32  `json:"gender"`
-	Birthday string `json:"birthday"`
-}
+// RegisterDvo UserInfoDvo
 
 type UserInfoDvo struct {
 	ID       int64  `json:"id"`
