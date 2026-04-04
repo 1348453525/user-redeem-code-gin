@@ -21,7 +21,7 @@ func Detail(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.RedeemCode.Detail(c, int64(id))
+	resp, err := logic.RedeemCodeLogic.Detail(c, int64(id))
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			result.Error(c, 500, entity.ErrInternal.Error())
@@ -43,7 +43,7 @@ func GetList(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.RedeemCode.GetList(c, &dto)
+	resp, err := logic.RedeemCodeLogic.GetList(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -62,7 +62,7 @@ func Update(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	err := logic.RedeemCode.Update(c, &dto)
+	err := logic.RedeemCodeLogic.Update(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -79,7 +79,7 @@ func Delete(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	err := logic.RedeemCode.Delete(c, int64(id))
+	err := logic.RedeemCodeLogic.Delete(c, int64(id))
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -98,7 +98,7 @@ func Use(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	err := logic.RedeemCode.Use(c, &dto)
+	err := logic.RedeemCodeLogic.Use(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
