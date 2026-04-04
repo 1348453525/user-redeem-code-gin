@@ -23,7 +23,10 @@ func Create(c *gin.Context) {
 
 	// 接收参数
 	var dto entity.CreateRedeemCodeBatchDto
-	_ = c.ShouldBindJSON(&dto)
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
 
 	// 验证参数
 	if ok := util.Validate(c, dto); !ok {
@@ -41,14 +44,15 @@ func Create(c *gin.Context) {
 
 func Detail(c *gin.Context) {
 	// 接收参数
-	id, _ := strconv.Atoi(c.Query("id"))
-	if id <= 0 {
+	idStr := c.Query("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id <= 0 {
 		result.Error(c, 400, entity.ErrParam.Error())
 		return
 	}
 
 	// 处理逻辑
-	resp, err := logic.RedeemCodeBatch.Detail(c, int64(id))
+	resp, err := logic.RedeemCodeBatch.Detail(c, id)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			result.Error(c, 500, entity.ErrInternal.Error())
@@ -62,7 +66,10 @@ func Detail(c *gin.Context) {
 func GetList(c *gin.Context) {
 	// 接收参数
 	var dto entity.GetRedeemCodeBatchListDto
-	_ = c.ShouldBindQuery(&dto)
+	if err := c.ShouldBindQuery(&dto); err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
 
 	// 验证参数
 	if ok := util.Validate(c, dto); !ok {
@@ -81,7 +88,10 @@ func GetList(c *gin.Context) {
 func Update(c *gin.Context) {
 	// 接收参数
 	var dto entity.UpdateRedeemCodeBatchDto
-	_ = c.ShouldBindJSON(&dto)
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
 
 	// 验证参数
 	if ok := util.Validate(c, dto); !ok {
@@ -99,14 +109,15 @@ func Update(c *gin.Context) {
 
 func Delete(c *gin.Context) {
 	// 接收参数
-	id, _ := strconv.Atoi(c.Query("id"))
-	if id <= 0 {
+	idStr := c.Query("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id <= 0 {
 		result.Error(c, 400, entity.ErrParam.Error())
 		return
 	}
 
 	// 处理逻辑
-	err := logic.RedeemCodeBatch.Delete(c, int64(id))
+	err = logic.RedeemCodeBatch.Delete(c, id)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return

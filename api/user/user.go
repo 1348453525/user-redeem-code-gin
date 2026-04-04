@@ -15,7 +15,10 @@ import (
 func Register(c *gin.Context) {
 	// 接收参数
 	var dto entity.RegisterDto
-	_ = c.ShouldBindJSON(&dto)
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
 
 	// 验证参数
 	if ok := util.Validate(c, dto); !ok {
@@ -34,7 +37,10 @@ func Register(c *gin.Context) {
 func Login(c *gin.Context) {
 	// 接收参数
 	var dto entity.LoginDto
-	_ = c.ShouldBindJSON(&dto)
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
 
 	// 验证参数
 	if ok := util.Validate(c, dto); !ok {
@@ -82,7 +88,10 @@ func Info(c *gin.Context) {
 func GetList(c *gin.Context) {
 	// 接收参数
 	var dto entity.GetUserListDto
-	_ = c.ShouldBindQuery(&dto)
+	if err := c.ShouldBindQuery(&dto); err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
 
 	// 验证参数
 	if ok := util.Validate(c, dto); !ok {
@@ -107,7 +116,10 @@ func Update(c *gin.Context) {
 
 	// 接收参数
 	var dto entity.UpdateUserDto
-	_ = c.ShouldBindJSON(&dto)
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
 
 	// 验证参数
 	if ok := util.Validate(c, dto); !ok {

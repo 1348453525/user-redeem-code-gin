@@ -1,7 +1,14 @@
 package entity
 
 import (
+	"errors"
+
 	"github.com/1348453525/user-redeem-code-gin/model"
+)
+
+var (
+	ErrRedeemCodeUsedUp  = errors.New("兑换码已用完")
+	ErrRedeemCodeExpired = errors.New("兑换码已过期")
 )
 
 // RedeemCodeDetailDto ID64

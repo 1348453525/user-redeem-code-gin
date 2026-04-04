@@ -14,17 +14,19 @@ import (
 
 func Detail(c *gin.Context) {
 	// 接收参数
-	id, _ := strconv.Atoi(c.Query("id"))
-	if id <= 0 {
+	idStr := c.Query("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id <= 0 {
 		result.Error(c, 400, entity.ErrParam.Error())
 		return
 	}
 
 	// 处理逻辑
-	resp, err := logic.RedeemCodeLogic.Detail(c, int64(id))
+	resp, err := logic.RedeemCodeLogic.Detail(c, id)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			result.Error(c, 500, entity.ErrInternal.Error())
+			return
 		}
 		result.Success(c)
 		return
@@ -35,7 +37,10 @@ func Detail(c *gin.Context) {
 func GetList(c *gin.Context) {
 	// 接收参数
 	var dto entity.GetRedeemCodeListDto
-	_ = c.ShouldBindQuery(&dto)
+	if err := c.ShouldBindQuery(&dto); err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
 
 	// 验证参数
 	if ok := util.Validate(c, dto); !ok {
@@ -54,7 +59,10 @@ func GetList(c *gin.Context) {
 func Update(c *gin.Context) {
 	// 接收参数
 	var dto entity.UpdateRedeemCodeDto
-	_ = c.ShouldBindJSON(&dto)
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
 
 	// 验证参数
 	if ok := util.Validate(c, dto); !ok {
@@ -72,14 +80,15 @@ func Update(c *gin.Context) {
 
 func Delete(c *gin.Context) {
 	// 接收参数
-	id, _ := strconv.Atoi(c.Query("id"))
-	if id <= 0 {
+	idStr := c.Query("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id <= 0 {
 		result.Error(c, 400, entity.ErrParam.Error())
 		return
 	}
 
 	// 处理逻辑
-	err := logic.RedeemCodeLogic.Delete(c, int64(id))
+	err = logic.RedeemCodeLogic.Delete(c, id)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -90,7 +99,10 @@ func Delete(c *gin.Context) {
 func Use(c *gin.Context) {
 	// 接收参数
 	var dto entity.UseRedeemCodeDto
-	_ = c.ShouldBindJSON(&dto)
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
 
 	// 验证参数
 	if ok := util.Validate(c, dto); !ok {
