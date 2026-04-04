@@ -47,6 +47,7 @@ func (l *RedeemCodeLogic) Update(c *gin.Context, r *entity.UpdateRedeemCodeDto) 
 	if r.ExpirationAt != "" {
 		expirationAt, err := helper.ParseDatetime(r.ExpirationAt)
 		if err != nil {
+			zap.L().Error("解析过期时间失败：", zap.Error(err))
 			return entity.ErrParam
 		}
 		redeemCodeModel.ExpirationAt = *expirationAt
@@ -55,7 +56,7 @@ func (l *RedeemCodeLogic) Update(c *gin.Context, r *entity.UpdateRedeemCodeDto) 
 		redeemCodeModel.IsDel = r.IsDel
 	}
 	if result := global.DB.Model(&model.RedeemCode{}).Where("id=?", r.ID).Updates(&redeemCodeModel); result.Error != nil {
-		zap.L().Error("更新兑换码失败：", zap.Error(result.Error))
+		zap.L().Error("更新兑换码失败：", zap.Error(result.Error), zap.Int64("id", r.ID))
 		return entity.ErrInternal
 	}
 	return nil
@@ -63,13 +64,14 @@ func (l *RedeemCodeLogic) Update(c *gin.Context, r *entity.UpdateRedeemCodeDto) 
 
 func (l *RedeemCodeLogic) Delete(c *gin.Context, id int64) error {
 	if result := global.DB.Model(&model.RedeemCode{}).Where("id=?", id).Update("is_del", 1); result.Error != nil {
-		zap.L().Error("更新兑换码失败：", zap.Error(result.Error))
+		zap.L().Error("删除兑换码失败：", zap.Error(result.Error), zap.Int64("id", id))
 		return entity.ErrInternal
 	}
 	return nil
 }
 
 func (l *RedeemCodeLogic) Use(c *gin.Context, r *entity.UseRedeemCodeDto) error {
+	zap.L().Info("兑换码使用开始：", zap.Int64("user_id", r.UserID), zap.Int64("redeem_code_id", r.RedeemCodeID))
 	// 开启事务
 	tx := global.DB.Begin()
 	defer func() {
@@ -87,6 +89,12 @@ func (l *RedeemCodeLogic) Use(c *gin.Context, r *entity.UseRedeemCodeDto) error 
 		return entity.ErrInternal
 	}
 
+	// 检查兑换码状态
+	if redeemCode.IsDel == 1 {
+		tx.Rollback()
+		return entity.ErrRedeemCodeInvalid
+	}
+
 	// 检查兑换码是否已过期
 	if time.Now().After(redeemCode.ExpirationAt) {
 		tx.Rollback()
@@ -99,7 +107,7 @@ func (l *RedeemCodeLogic) Use(c *gin.Context, r *entity.UseRedeemCodeDto) error 
 		return entity.ErrRedeemCodeUsedUp
 	}
 
-	// 增加使用记录
+	// 创建使用记录
 	redeemCodeRecord := model.RedeemCodeRecord{
 		UserID:       r.UserID,
 		RedeemCodeID: r.RedeemCodeID,
@@ -116,11 +124,12 @@ func (l *RedeemCodeLogic) Use(c *gin.Context, r *entity.UseRedeemCodeDto) error 
 		Update("used_count", gorm.Expr("used_count + 1"))
 	if result.Error != nil {
 		tx.Rollback()
-		zap.L().Error("更新兑换码使用数量失败：", zap.Error(result.Error))
+		zap.L().Error("更新兑换码使用数量失败：", zap.Error(result.Error), zap.Int64("user_id", r.UserID), zap.Int64("redeem_code_id", r.RedeemCodeID))
 		return entity.ErrInternal
 	}
 	if result.RowsAffected == 0 {
 		tx.Rollback()
+		zap.L().Warn("兑换码使用失败：乐观锁失败，可能已被其他用户使用", zap.Int64("user_id", r.UserID), zap.Int64("redeem_code_id", r.RedeemCodeID))
 		return entity.ErrRedeemCodeUsedUp
 	}
 
@@ -128,7 +137,7 @@ func (l *RedeemCodeLogic) Use(c *gin.Context, r *entity.UseRedeemCodeDto) error 
 	if redeemCode.UsedCount+1 >= redeemCode.UsageLimit {
 		if err := tx.Model(&model.RedeemCodeBatch{}).Where("id = ?", redeemCode.RedeemCodeBatchID).Update("used_count", gorm.Expr("used_count + 1")).Error; err != nil {
 			tx.Rollback()
-			zap.L().Error("更新批次使用数量失败：", zap.Error(err))
+			zap.L().Error("更新批次使用数量失败：", zap.Error(err), zap.Int64("user_id", r.UserID), zap.Int64("redeem_code_id", r.RedeemCodeID), zap.Int64("batch_id", redeemCode.RedeemCodeBatchID))
 			return entity.ErrInternal
 		}
 	}
@@ -136,8 +145,12 @@ func (l *RedeemCodeLogic) Use(c *gin.Context, r *entity.UseRedeemCodeDto) error 
 	// 提交事务
 	if err := tx.Commit().Error; err != nil {
 		zap.L().Error("提交事务失败：", zap.Error(err))
+		if err := tx.Rollback().Error; err != nil {
+			zap.L().Error("事务回滚失败：", zap.Error(err))
+		}
 		return entity.ErrInternal
 	}
 
+	zap.L().Info("兑换码使用成功：", zap.Int64("user_id", r.UserID), zap.Int64("redeem_code_id", r.RedeemCodeID))
 	return nil
 }

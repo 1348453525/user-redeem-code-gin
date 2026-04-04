@@ -8,11 +8,12 @@ import (
 	"github.com/1348453525/user-redeem-code-gin/initialize"
 	"github.com/1348453525/user-redeem-code-gin/logic"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func TestRegister() {
 	ctx := &gin.Context{}
-	mobile := 1301301300
+	mobile := 13013130000
 	for i := 0; i < 100; i++ {
 		mobile++
 		r := &entity.RegisterDto{
@@ -26,6 +27,7 @@ func TestRegister() {
 		}
 		_, err := logic.NewUserLogic().Register(ctx, r)
 		if err != nil {
+			zap.L().Error("创建用户错误：", zap.Error(err), zap.Any("raw", r))
 			panic(err)
 		}
 	}
