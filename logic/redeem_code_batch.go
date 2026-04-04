@@ -10,11 +10,13 @@ import (
 	"go.uber.org/zap"
 )
 
-type redeemCodeBatch struct{}
+type RedeemCodeBatchLogic struct{}
 
-var RedeemCodeBatch redeemCodeBatch
+func NewRedeemCodeBatchLogic() *RedeemCodeBatchLogic {
+	return &RedeemCodeBatchLogic{}
+}
 
-func (l *redeemCodeBatch) Create(c *gin.Context, userID int64, r *entity.CreateRedeemCodeBatchDto) (*model.RedeemCodeBatch, error) {
+func (l *RedeemCodeBatchLogic) Create(c *gin.Context, userID int64, r *entity.CreateRedeemCodeBatchDto) (*model.RedeemCodeBatch, error) {
 	// 获取用户信息
 	var userModel model.User
 	if err := userModel.GetByID(userID); err != nil {
@@ -66,7 +68,7 @@ func (l *redeemCodeBatch) Create(c *gin.Context, userID int64, r *entity.CreateR
 	return &redeemCodeBatchModel, nil
 }
 
-func (l *redeemCodeBatch) Detail(c *gin.Context, id int64) (*model.RedeemCodeBatch, error) {
+func (l *RedeemCodeBatchLogic) Detail(c *gin.Context, id int64) (*model.RedeemCodeBatch, error) {
 	var redeemCodeBatchModel model.RedeemCodeBatch
 	if err := redeemCodeBatchModel.GetByID(id); err != nil {
 		return nil, entity.ErrInternal
@@ -74,7 +76,7 @@ func (l *redeemCodeBatch) Detail(c *gin.Context, id int64) (*model.RedeemCodeBat
 	return &redeemCodeBatchModel, nil
 }
 
-func (l *redeemCodeBatch) GetList(c *gin.Context, r *entity.GetRedeemCodeBatchListDto) (*entity.GetRedeemCodeBatchListDvo, error) {
+func (l *RedeemCodeBatchLogic) GetList(c *gin.Context, r *entity.GetRedeemCodeBatchListDto) (*entity.GetRedeemCodeBatchListDvo, error) {
 	var redeemCodeBatchModel model.RedeemCodeBatch
 	list, count := redeemCodeBatchModel.GetList(r.Page, r.PageSize)
 	resp := &entity.GetRedeemCodeBatchListDvo{
@@ -86,7 +88,7 @@ func (l *redeemCodeBatch) GetList(c *gin.Context, r *entity.GetRedeemCodeBatchLi
 	return resp, nil
 }
 
-func (l *redeemCodeBatch) Update(c *gin.Context, r *entity.UpdateRedeemCodeBatchDto) error {
+func (l *RedeemCodeBatchLogic) Update(c *gin.Context, r *entity.UpdateRedeemCodeBatchDto) error {
 	startedAt, err := helper.ParseDatetime(r.StartedAt)
 	if err != nil {
 		return entity.ErrParam
@@ -107,16 +109,16 @@ func (l *redeemCodeBatch) Update(c *gin.Context, r *entity.UpdateRedeemCodeBatch
 	}
 	result := global.DB.Model(&model.RedeemCodeBatch{}).Where("id=?", r.ID).Updates(&redeemCodeBatchModel)
 	if result.Error != nil {
-		zap.L().Error("更新用户失败：", zap.Error(result.Error))
+		zap.L().Error("更新兑换码批次失败：", zap.Error(result.Error))
 		return entity.ErrInternal
 	}
 	return nil
 }
 
-func (l *redeemCodeBatch) Delete(c *gin.Context, id int64) error {
+func (l *RedeemCodeBatchLogic) Delete(c *gin.Context, id int64) error {
 	result := global.DB.Model(&model.RedeemCodeBatch{}).Where("id=?", id).Update("status", 2)
 	if result.Error != nil {
-		zap.L().Error("删除用户失败：", zap.Error(result.Error))
+		zap.L().Error("删除兑换码批次失败：", zap.Error(result.Error))
 		return entity.ErrInternal
 	}
 	return nil

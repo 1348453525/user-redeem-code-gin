@@ -26,7 +26,7 @@ func Register(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.User.Register(c, &dto)
+	resp, err := logic.NewUserLogic().Register(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -48,7 +48,7 @@ func Login(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.User.Login(c, &dto)
+	resp, err := logic.NewUserLogic().Login(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -74,7 +74,7 @@ func Info(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.User.Info(c, id)
+	resp, err := logic.NewUserLogic().Info(c, id)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			result.Error(c, 500, entity.ErrInternal.Error())
@@ -99,7 +99,7 @@ func GetList(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.User.GetList(c, &dto)
+	resp, err := logic.NewUserLogic().GetList(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -131,7 +131,7 @@ func Update(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	err = logic.User.Update(c, &dto)
+	err = logic.NewUserLogic().Update(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -153,7 +153,7 @@ func Delete(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	err = logic.User.Delete(c, id)
+	err = logic.NewUserLogic().Delete(c, id)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return

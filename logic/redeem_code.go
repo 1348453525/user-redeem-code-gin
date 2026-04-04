@@ -12,11 +12,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type redeemCodeLogic struct{}
+type RedeemCodeLogic struct{}
 
-var RedeemCodeLogic redeemCodeLogic
+func NewRedeemCodeLogic() *RedeemCodeLogic {
+	return &RedeemCodeLogic{}
+}
 
-func (l *redeemCodeLogic) Detail(c *gin.Context, id int64) (*model.RedeemCode, error) {
+func (l *RedeemCodeLogic) Detail(c *gin.Context, id int64) (*model.RedeemCode, error) {
 	var redeemCode model.RedeemCode
 	if err := redeemCode.GetByID(id); err != nil {
 		return nil, err
@@ -24,7 +26,7 @@ func (l *redeemCodeLogic) Detail(c *gin.Context, id int64) (*model.RedeemCode, e
 	return &redeemCode, nil
 }
 
-func (l *redeemCodeLogic) GetList(c *gin.Context, r *entity.GetRedeemCodeListDto) (*entity.GetRedeemCodeListDvo, error) {
+func (l *RedeemCodeLogic) GetList(c *gin.Context, r *entity.GetRedeemCodeListDto) (*entity.GetRedeemCodeListDvo, error) {
 	var redeemCodeModel model.RedeemCode
 	list, count := redeemCodeModel.GetList(r.Page, r.PageSize)
 	return &entity.GetRedeemCodeListDvo{
@@ -35,7 +37,7 @@ func (l *redeemCodeLogic) GetList(c *gin.Context, r *entity.GetRedeemCodeListDto
 	}, nil
 }
 
-func (l *redeemCodeLogic) Update(c *gin.Context, r *entity.UpdateRedeemCodeDto) error {
+func (l *RedeemCodeLogic) Update(c *gin.Context, r *entity.UpdateRedeemCodeDto) error {
 	redeemCodeModel := model.RedeemCode{
 		ID: r.ID,
 	}
@@ -59,7 +61,7 @@ func (l *redeemCodeLogic) Update(c *gin.Context, r *entity.UpdateRedeemCodeDto) 
 	return nil
 }
 
-func (l *redeemCodeLogic) Delete(c *gin.Context, id int64) error {
+func (l *RedeemCodeLogic) Delete(c *gin.Context, id int64) error {
 	if result := global.DB.Model(&model.RedeemCode{}).Where("id=?", id).Update("is_del", 1); result.Error != nil {
 		zap.L().Error("更新兑换码失败：", zap.Error(result.Error))
 		return entity.ErrInternal
@@ -67,7 +69,7 @@ func (l *redeemCodeLogic) Delete(c *gin.Context, id int64) error {
 	return nil
 }
 
-func (l *redeemCodeLogic) Use(c *gin.Context, r *entity.UseRedeemCodeDto) error {
+func (l *RedeemCodeLogic) Use(c *gin.Context, r *entity.UseRedeemCodeDto) error {
 	// 开启事务
 	tx := global.DB.Begin()
 	defer func() {

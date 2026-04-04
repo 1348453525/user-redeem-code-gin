@@ -56,7 +56,7 @@ func Db(c *gin.Context) {
 		return
 	}
 
-	res, err := logic.Test.Db(uint64(id))
+	res, err := logic.NewTestLogic().Db(uint64(id))
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			result.Success(c)
@@ -69,7 +69,7 @@ func Db(c *gin.Context) {
 }
 
 func Redis(c *gin.Context) {
-	value := logic.Test.Redis()
+	value := logic.NewTestLogic().Redis()
 	result.Success(c, gin.H{
 		"value": value,
 	})

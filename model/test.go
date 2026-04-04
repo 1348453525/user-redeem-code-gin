@@ -19,8 +19,8 @@ func (*Test) TableName() string {
 }
 
 // GetByID 根据ID获取Test信息
-func (t *Test) GetByID(id uint64) error {
-	result := global.DB.Where("id = ?", id).First(t)
+func (m *Test) GetByID(id uint64) error {
+	result := global.DB.Where("id = ?", id).First(m)
 	if result.Error != nil {
 		return result.Error
 	}

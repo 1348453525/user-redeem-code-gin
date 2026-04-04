@@ -24,7 +24,7 @@ func TestRegister() {
 			Password:        "123456",
 			ConfirmPassword: "123456",
 		}
-		_, err := logic.User.Register(ctx, r)
+		_, err := logic.NewUserLogic().Register(ctx, r)
 		if err != nil {
 			panic(err)
 		}

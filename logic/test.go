@@ -10,11 +10,13 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type test struct{}
+type TestLogic struct{}
 
-var Test = &test{}
+func NewTestLogic() *TestLogic {
+	return &TestLogic{}
+}
 
-func (t *test) Db(id uint64) (*model.Test, error) {
+func (l *TestLogic) Db(id uint64) (*model.Test, error) {
 	test := &model.Test{}
 	if err := test.GetByID(id); err != nil {
 		return nil, err
@@ -22,7 +24,7 @@ func (t *test) Db(id uint64) (*model.Test, error) {
 	return test, nil
 }
 
-func (t *test) Redis() string {
+func (l *TestLogic) Redis() string {
 	key := "test"
 	value, err := global.Redis.Get(context.Background(), key).Result()
 	if err != nil {

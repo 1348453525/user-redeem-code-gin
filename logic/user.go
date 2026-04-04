@@ -18,11 +18,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type user struct{}
+type UserLogic struct{}
 
-var User = &user{}
+func NewUserLogic() *UserLogic {
+	return &UserLogic{}
+}
 
-func (u *user) Register(c *gin.Context, r *entity.RegisterDto) (*entity.RegisterDvo, error) {
+func (l *UserLogic) Register(c *gin.Context, r *entity.RegisterDto) (*entity.RegisterDvo, error) {
 	// 验证密码是否一致
 	if r.Password != r.ConfirmPassword {
 		return nil, entity.ErrPasswordNotMatch
@@ -84,7 +86,7 @@ func (u *user) Register(c *gin.Context, r *entity.RegisterDto) (*entity.Register
 	return resp, nil
 }
 
-func (u *user) Login(c *gin.Context, r *entity.LoginDto) (*entity.LoginDvo, error) {
+func (l *UserLogic) Login(c *gin.Context, r *entity.LoginDto) (*entity.LoginDvo, error) {
 	// 查询用户
 	var user model.User
 	result := global.DB.Where("username = ?", r.Username).First(&user)
@@ -135,7 +137,7 @@ func (u *user) Login(c *gin.Context, r *entity.LoginDto) (*entity.LoginDvo, erro
 	return resp, nil
 }
 
-func (u *user) Info(c *gin.Context, id int64) (*entity.UserInfoDvo, error) {
+func (l *UserLogic) Info(c *gin.Context, id int64) (*entity.UserInfoDvo, error) {
 	var user model.User
 	if err := user.GetByID(id); err != nil {
 		return nil, err
@@ -153,7 +155,7 @@ func (u *user) Info(c *gin.Context, id int64) (*entity.UserInfoDvo, error) {
 	return resp, nil
 }
 
-func (u *user) GetList(c *gin.Context, r *entity.GetUserListDto) (*entity.GetUserListDvo, error) {
+func (l *UserLogic) GetList(c *gin.Context, r *entity.GetUserListDto) (*entity.GetUserListDvo, error) {
 	var user model.User
 	list, count := user.GetList(r.Page, r.PageSize)
 	resp := &entity.GetUserListDvo{
@@ -176,7 +178,7 @@ func (u *user) GetList(c *gin.Context, r *entity.GetUserListDto) (*entity.GetUse
 	return resp, nil
 }
 
-func (u *user) Update(c *gin.Context, r *entity.UpdateUserDto) error {
+func (l *UserLogic) Update(c *gin.Context, r *entity.UpdateUserDto) error {
 	// 查询用户是否存在
 	var user model.User
 	result := global.DB.Where("id = ?", r.ID).First(&user)
@@ -210,7 +212,7 @@ func (u *user) Update(c *gin.Context, r *entity.UpdateUserDto) error {
 	return nil
 }
 
-func (u *user) Delete(c *gin.Context, id int64) error {
+func (l *UserLogic) Delete(c *gin.Context, id int64) error {
 	// 删除用户
 	user := model.User{
 		IsDel: 1,

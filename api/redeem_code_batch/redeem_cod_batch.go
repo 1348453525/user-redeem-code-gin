@@ -34,7 +34,7 @@ func Create(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.RedeemCodeBatch.Create(c, id, &dto)
+	resp, err := logic.NewRedeemCodeBatchLogic().Create(c, id, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -52,7 +52,7 @@ func Detail(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.RedeemCodeBatch.Detail(c, id)
+	resp, err := logic.NewRedeemCodeBatchLogic().Detail(c, id)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			result.Error(c, 500, entity.ErrInternal.Error())
@@ -77,7 +77,7 @@ func GetList(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.RedeemCodeBatch.GetList(c, &dto)
+	resp, err := logic.NewRedeemCodeBatchLogic().GetList(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -99,7 +99,7 @@ func Update(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	err := logic.RedeemCodeBatch.Update(c, &dto)
+	err := logic.NewRedeemCodeBatchLogic().Update(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -117,7 +117,7 @@ func Delete(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	err = logic.RedeemCodeBatch.Delete(c, id)
+	err = logic.NewRedeemCodeBatchLogic().Delete(c, id)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
