@@ -1,4 +1,4 @@
-package test
+package handler
 
 import (
 	"errors"
@@ -11,11 +11,17 @@ import (
 	"gorm.io/gorm"
 )
 
-func Test(c *gin.Context) {
+type Test struct{}
+
+func NewTest() *Test {
+	return &Test{}
+}
+
+func (h *Test) Test(c *gin.Context) {
 	result.Success(c)
 }
 
-func TestData(c *gin.Context) {
+func (h *Test) TestData(c *gin.Context) {
 	result.Success(
 		c,
 		gin.H{
@@ -26,11 +32,11 @@ func TestData(c *gin.Context) {
 	)
 }
 
-func TestError(c *gin.Context) {
+func (h *Test) TestError(c *gin.Context) {
 	result.Error(c)
 }
 
-func TestErrorData(c *gin.Context) {
+func (h *Test) TestErrorData(c *gin.Context) {
 	result.Error(
 		c,
 		500,
@@ -44,12 +50,12 @@ func TestErrorData(c *gin.Context) {
 	)
 }
 
-func Shutdown(c *gin.Context) {
+func (h *Test) Shutdown(c *gin.Context) {
 	time.Sleep(10 * time.Second)
 	result.Success(c, gin.H{}, 200, "ok")
 }
 
-func Db(c *gin.Context) {
+func (h *Test) Db(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Query("id"))
 	if id <= 0 {
 		result.Error(c, 400, "参数错误")
@@ -68,7 +74,7 @@ func Db(c *gin.Context) {
 	result.Success(c, res)
 }
 
-func Redis(c *gin.Context) {
+func (h *Test) Redis(c *gin.Context) {
 	value := logic.NewTestLogic().Redis()
 	result.Success(c, gin.H{
 		"value": value,

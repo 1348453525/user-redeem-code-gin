@@ -1,4 +1,4 @@
-package redeem_code
+package handler
 
 import (
 	"errors"
@@ -12,7 +12,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func Detail(c *gin.Context) {
+type RedeemCode struct{}
+
+func NewRedeemCode() *RedeemCode {
+	return &RedeemCode{}
+}
+
+func (h *RedeemCode) Detail(c *gin.Context) {
 	// 接收参数
 	idStr := c.Query("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
@@ -34,7 +40,7 @@ func Detail(c *gin.Context) {
 	result.Success(c, resp)
 }
 
-func GetList(c *gin.Context) {
+func (h *RedeemCode) GetList(c *gin.Context) {
 	// 接收参数
 	var dto entity.GetRedeemCodeListDto
 	if err := c.ShouldBindQuery(&dto); err != nil {
@@ -56,7 +62,7 @@ func GetList(c *gin.Context) {
 	result.Success(c, resp)
 }
 
-func Update(c *gin.Context) {
+func (h *RedeemCode) Update(c *gin.Context) {
 	// 接收参数
 	var dto entity.UpdateRedeemCodeDto
 	if err := c.ShouldBindJSON(&dto); err != nil {
@@ -78,7 +84,7 @@ func Update(c *gin.Context) {
 	result.Success(c)
 }
 
-func Delete(c *gin.Context) {
+func (h *RedeemCode) Delete(c *gin.Context) {
 	// 接收参数
 	idStr := c.Query("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
@@ -96,7 +102,7 @@ func Delete(c *gin.Context) {
 	result.Success(c)
 }
 
-func Use(c *gin.Context) {
+func (h *RedeemCode) Use(c *gin.Context) {
 	// 接收参数
 	var dto entity.UseRedeemCodeDto
 	if err := c.ShouldBindJSON(&dto); err != nil {

@@ -1,8 +1,7 @@
-package redeem_code_batch
+package handler
 
 import (
 	"errors"
-	"strconv"
 
 	"github.com/1348453525/user-redeem-code-gin/entity"
 	"github.com/1348453525/user-redeem-code-gin/logic"
@@ -13,16 +12,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func Create(c *gin.Context) {
-	// 获取用户 id
-	id, err := helper.GetUserID(c)
-	if err != nil {
-		result.Error(c, 400, entity.ErrParam.Error())
-		return
-	}
+type User struct{}
 
+func NewUser() *User {
+	return &User{}
+}
+
+func (h *User) Register(c *gin.Context) {
 	// 接收参数
-	var dto entity.CreateRedeemCodeBatchDto
+	var dto entity.RegisterDto
 	if err := c.ShouldBindJSON(&dto); err != nil {
 		result.Error(c, 400, entity.ErrParam.Error())
 		return
@@ -34,7 +32,7 @@ func Create(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.NewRedeemCodeBatchLogic().Create(c, id, &dto)
+	resp, err := logic.NewUserLogic().Register(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -42,17 +40,47 @@ func Create(c *gin.Context) {
 	result.Success(c, resp)
 }
 
-func Detail(c *gin.Context) {
+func (h *User) Login(c *gin.Context) {
 	// 接收参数
-	idStr := c.Query("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil || id <= 0 {
+	var dto entity.LoginDto
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
+
+	// 验证参数
+	if ok := util.Validate(c, dto); !ok {
+		return
+	}
+
+	// 处理逻辑
+	resp, err := logic.NewUserLogic().Login(c, &dto)
+	if err != nil {
+		result.Error(c, 500, err.Error())
+		return
+	}
+	result.Success(c, resp)
+}
+
+func (h *User) Logout(c *gin.Context) {
+	result.Success(c)
+}
+
+func (h *User) Info(c *gin.Context) {
+	// 接收参数
+	// id, _ := strconv.Atoi(c.Query("id"))
+	// if id <= 0 {
+	// 	result.Error(c, 400, entity.ErrParam.Error())
+	// 	return
+	// }
+	id, err := helper.GetUserID(c)
+	if err != nil {
 		result.Error(c, 400, entity.ErrParam.Error())
 		return
 	}
 
 	// 处理逻辑
-	resp, err := logic.NewRedeemCodeBatchLogic().Detail(c, id)
+	resp, err := logic.NewUserLogic().Info(c, id)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			result.Error(c, 500, entity.ErrInternal.Error())
@@ -63,9 +91,9 @@ func Detail(c *gin.Context) {
 	result.Success(c, resp)
 }
 
-func GetList(c *gin.Context) {
+func (h *User) GetList(c *gin.Context) {
 	// 接收参数
-	var dto entity.GetRedeemCodeBatchListDto
+	var dto entity.GetUserListDto
 	if err := c.ShouldBindQuery(&dto); err != nil {
 		result.Error(c, 400, entity.ErrParam.Error())
 		return
@@ -77,7 +105,7 @@ func GetList(c *gin.Context) {
 	}
 
 	// 处理逻辑
-	resp, err := logic.NewRedeemCodeBatchLogic().GetList(c, &dto)
+	resp, err := logic.NewUserLogic().GetList(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -85,9 +113,15 @@ func GetList(c *gin.Context) {
 	result.Success(c, resp)
 }
 
-func Update(c *gin.Context) {
+func (h *User) Update(c *gin.Context) {
+	id, err := helper.GetUserID(c)
+	if err != nil {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
+
 	// 接收参数
-	var dto entity.UpdateRedeemCodeBatchDto
+	var dto entity.UpdateUserDto
 	if err := c.ShouldBindJSON(&dto); err != nil {
 		result.Error(c, 400, entity.ErrParam.Error())
 		return
@@ -97,9 +131,13 @@ func Update(c *gin.Context) {
 	if ok := util.Validate(c, dto); !ok {
 		return
 	}
+	if id != dto.ID {
+		result.Error(c, 400, entity.ErrParam.Error())
+		return
+	}
 
 	// 处理逻辑
-	err := logic.NewRedeemCodeBatchLogic().Update(c, &dto)
+	err = logic.NewUserLogic().Update(c, &dto)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return
@@ -107,17 +145,21 @@ func Update(c *gin.Context) {
 	result.Success(c)
 }
 
-func Delete(c *gin.Context) {
+func (h *User) Delete(c *gin.Context) {
 	// 接收参数
-	idStr := c.Query("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil || id <= 0 {
+	// id, _ := strconv.Atoi(c.Query("id"))
+	// if id <= 0 {
+	// 	result.Error(c, 400, entity.ErrParam.Error())
+	// 	return
+	// }
+	id, err := helper.GetUserID(c)
+	if err != nil {
 		result.Error(c, 400, entity.ErrParam.Error())
 		return
 	}
 
 	// 处理逻辑
-	err = logic.NewRedeemCodeBatchLogic().Delete(c, id)
+	err = logic.NewUserLogic().Delete(c, id)
 	if err != nil {
 		result.Error(c, 500, err.Error())
 		return

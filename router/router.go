@@ -1,16 +1,14 @@
 package router
 
 import (
-	"github.com/1348453525/user-redeem-code-gin/api/redeem_code"
-	"github.com/1348453525/user-redeem-code-gin/api/redeem_code_batch"
-	"github.com/1348453525/user-redeem-code-gin/api/test"
-	"github.com/1348453525/user-redeem-code-gin/api/user"
+	"github.com/1348453525/user-redeem-code-gin/handler"
 	"github.com/1348453525/user-redeem-code-gin/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func RouterGroup(r *gin.RouterGroup) {
 	// test
+	test := handler.NewTest()
 	testGroup := r.Group("/Test")
 	{
 		testGroup.GET("/Test", test.Test)
@@ -23,6 +21,7 @@ func RouterGroup(r *gin.RouterGroup) {
 	}
 
 	// auth 注册、登录、退出
+	user := handler.NewUser()
 	r.POST("/Register", user.Register)                            // 注册
 	r.POST("/Login", user.Login)                                  // 登录
 	r.GET("/Logout", middleware.JWTAuthMiddleware(), user.Logout) // 退出
@@ -39,24 +38,26 @@ func RouterGroup(r *gin.RouterGroup) {
 	}
 
 	// 兑换码批次
+	redeemCodeBatch := handler.NewRedeemCodeBatch()
 	redeemCodeBatchGroup := r.Group("/RedeemCodeBatch")
 	redeemCodeBatchGroup.Use(middleware.JWTAuthMiddleware())
 	{
-		redeemCodeBatchGroup.POST("/Create", redeem_code_batch.Create)   // 创建兑换码批次
-		redeemCodeBatchGroup.GET("/Detail", redeem_code_batch.Detail)    // 获取兑换码批次详情
-		redeemCodeBatchGroup.GET("/GetList", redeem_code_batch.GetList)  // 获取兑换码批次列表
-		redeemCodeBatchGroup.PUT("/Update", redeem_code_batch.Update)    // 更新兑换码批次
-		redeemCodeBatchGroup.DELETE("/Delete", redeem_code_batch.Delete) // 删除兑换码批次
+		redeemCodeBatchGroup.POST("/Create", redeemCodeBatch.Create)   // 创建兑换码批次
+		redeemCodeBatchGroup.GET("/Detail", redeemCodeBatch.Detail)    // 获取兑换码批次详情
+		redeemCodeBatchGroup.GET("/GetList", redeemCodeBatch.GetList)  // 获取兑换码批次列表
+		redeemCodeBatchGroup.PUT("/Update", redeemCodeBatch.Update)    // 更新兑换码批次
+		redeemCodeBatchGroup.DELETE("/Delete", redeemCodeBatch.Delete) // 删除兑换码批次
 	}
 
 	// 兑换码
+	redeemCode := handler.NewRedeemCode()
 	redeemCodeGroup := r.Group("/RedeemCode")
 	redeemCodeGroup.Use(middleware.JWTAuthMiddleware())
 	{
-		redeemCodeGroup.GET("/Detail", redeem_code.Detail)    // 获取兑换码详情
-		redeemCodeGroup.GET("/GetList", redeem_code.GetList)  // 获取兑换码列表
-		redeemCodeGroup.PUT("/Update", redeem_code.Update)    // 更新兑换码
-		redeemCodeGroup.DELETE("/Delete", redeem_code.Delete) // 删除兑换码
-		redeemCodeGroup.POST("/Use", redeem_code.Use)         // 使用兑换码
+		redeemCodeGroup.GET("/Detail", redeemCode.Detail)    // 获取兑换码详情
+		redeemCodeGroup.GET("/GetList", redeemCode.GetList)  // 获取兑换码列表
+		redeemCodeGroup.PUT("/Update", redeemCode.Update)    // 更新兑换码
+		redeemCodeGroup.DELETE("/Delete", redeemCode.Delete) // 删除兑换码
+		redeemCodeGroup.POST("/Use", redeemCode.Use)         // 使用兑换码
 	}
 }
