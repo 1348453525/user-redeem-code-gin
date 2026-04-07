@@ -62,6 +62,7 @@ func (h *RedeemCodeBatch) Detail(c *gin.Context) {
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			result.Error(c, 500, entity.ErrInternal.Error())
+			return
 		}
 		result.Success(c)
 		return
